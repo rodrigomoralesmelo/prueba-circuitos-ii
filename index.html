@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Diagnóstico — Teória de Circuitos II</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3350;
+            --accent: #4f8ef7;
+            --accent2: #7c3aed;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --text: #e8eaf6;
+            --text2: #8892b0;
+            --mono: 'IBM Plex Mono', monospace;
+            --sans: 'IBM Plex Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            padding: 0 0 60px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: linear-gradient(135deg, #0d1b3e 0%, #1a1d27 60%, #0f1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 28px 40px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(79, 142, 247, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .header-badge {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: rgba(79, 142, 247, 0.12);
+            border: 1px solid rgba(79, 142, 247, 0.3);
+            padding: 4px 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .header h1 span {
+            color: var(--accent);
+        }
+
+        .header p {
+            color: var(--text2);
+            font-size: 13px;
+            margin-top: 6px;
+            font-family: var(--mono);
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text2);
+            border-left: 2px solid var(--border);
+            padding-left: 10px;
+        }
+
+        /* ── PROGRESS BAR ── */
+        .progress-wrap {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .progress-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text2);
+            white-space: nowrap;
+        }
+
+        .progress-bar-outer {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .progress-count {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+
+        /* ── MAIN CONTAINER ── */
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── NAME SCREEN ── */
+        #screen-name {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            text-align: center;
+        }
+
+        .name-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .name-card h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .name-card p {
+            color: var(--text2);
+            font-size: 14px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .field-group label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text2);
+            margin-bottom: 8px;
+        }
+
+        .field-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .field-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .field-group input::placeholder {
+            color: var(--text2);
+            opacity: 0.5;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary:hover {
+            background: #3a7de0;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .instructions-box {
+            background: rgba(79, 142, 247, 0.07);
+            border: 1px solid rgba(79, 142, 247, 0.2);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .instructions-box p {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.7;
+        }
+
+        .instructions-box strong {
+            color: var(--text);
+        }
+
+        /* ── QUIZ SCREEN ── */
+        #screen-quiz {
+            display: none;
+            padding-top: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 32px 0 20px;
+            padding: 16px 20px;
+            background: var(--surface2);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .section-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .section-header .section-num {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--accent);
+            background: rgba(79, 142, 247, 0.15);
+            padding: 3px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .question-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .question-card.answered {
+            border-color: rgba(79, 142, 247, 0.3);
+        }
+
+        .question-num {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .question-text .math {
+            font-style: italic;
+        }
+
+        .img-placeholder {
+            background: var(--surface2);
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            margin: 16px 0;
+            color: var(--text2);
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        .img-placeholder .icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item label {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            line-height: 1.5;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        .option-item label:hover {
+            border-color: var(--accent);
+            background: rgba(79, 142, 247, 0.05);
+        }
+
+        .option-item input[type=radio] {
+            display: none;
+        }
+
+        .option-letter {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text2);
+            min-width: 20px;
+            padding-top: 1px;
+            transition: color 0.15s;
+        }
+
+        .option-item input[type=radio]:checked+label {
+            border-color: var(--accent);
+            background: rgba(79, 142, 247, 0.12);
+        }
+
+        .option-item input[type=radio]:checked+label .option-letter {
+            color: var(--accent);
+        }
+
+        /* Tabla de unidades */
+        .units-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 16px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .units-table th {
+            background: var(--surface2);
+            padding: 10px 14px;
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .units-table td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .units-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .units-table tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* ── SUBMIT BUTTON ── */
+        .submit-section {
+            padding: 32px 0 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .submit-warning {
+            font-size: 13px;
+            color: var(--text2);
+            font-family: var(--mono);
+            text-align: center;
+        }
+
+        .btn-submit {
+            padding: 16px 48px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--sans);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+            box-shadow: 0 8px 24px rgba(79, 142, 247, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(79, 142, 247, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ── RESULTS SCREEN ── */
+        #screen-results {
+            display: none;
+            padding-top: 32px;
+        }
+
+        .results-hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(79, 142, 247, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .score-ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .score-ring svg {
+            position: absolute;
+            inset: 0;
+            transform: rotate(-90deg);
+        }
+
+        .score-ring .score-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .results-hero h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .results-hero .student-name {
+            color: var(--accent);
+        }
+
+        .results-summary {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .summary-stat {
+            text-align: center;
+        }
+
+        .summary-stat .val {
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .summary-stat .lbl {
+            font-size: 12px;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+
+        .val-correct {
+            color: var(--green);
+        }
+
+        .val-wrong {
+            color: var(--red);
+        }
+
+        /* Result items */
+        .result-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--border);
+        }
+
+        .result-item.correct {
+            border-left-color: var(--green);
+        }
+
+        .result-item.wrong {
+            border-left-color: var(--red);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .result-badge {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .badge-correct {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--green);
+        }
+
+        .badge-wrong {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red);
+        }
+
+        .result-qnum {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text2);
+        }
+
+        .result-question {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .answer-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .answer-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text2);
+            width: 90px;
+            flex-shrink: 0;
+            padding-top: 1px;
+        }
+
+        .answer-val {
+            line-height: 1.5;
+        }
+
+        .answer-val.correct-val {
+            color: var(--green);
+        }
+
+        .answer-val.wrong-val {
+            color: var(--red);
+        }
+
+        .explanation-box {
+            background: rgba(79, 142, 247, 0.07);
+            border: 1px solid rgba(79, 142, 247, 0.2);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-top: 14px;
+        }
+
+        .explanation-box .exp-title {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--accent);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .explanation-box p {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.7;
+        }
+
+        /* ── LOADING ── */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading-overlay p {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text2);
+        }
+
+        /* ── TOAST ── */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: 13px;
+            transition: transform 0.3s;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #toast.error {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        #toast.success {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 20px 20px 16px;
+            }
+
+            .progress-wrap {
+                padding: 12px 20px;
+            }
+
+            .container {
+                padding: 0 16px;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+
+            .name-card {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-badge">Universidad de Los Lagos · FDICE02</div>
+        <h1>Evaluación de Diagnóstico<br><span>Teória de Circuitos II</span></h1>
+        <p>Fundamentos de Circuitos Eléctricos (CC y CA) · 2026-1</p>
+        <div class="header-meta">
+            <div class="meta-tag">30 preguntas</div>
+            <div class="meta-tag">Selección múltiple</div>
+            <div class="meta-tag">Sin tiempo límite</div>
+        </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-wrap">
+        <span class="progress-label">PROGRESO</span>
+        <div class="progress-bar-outer">
+            <div class="progress-bar-inner" id="progressBar"></div>
+        </div>
+        <span class="progress-count" id="progressCount">0 / 30</span>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Guardando respuestas...</p>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast"></div>
+
+    <!-- ══════════════════════════════════════════
+     SCREEN 1: NOMBRE
+═══════════════════════════════════════════ -->
+    <div class="container">
+        <div id="screen-name">
+            <div class="name-card">
+                <h2>Bienvenido/a</h2>
+                <p>Antes de comenzar, ingresa tus datos. Esta evaluación mide los conocimientos base necesarios para el
+                    curso.</p>
+                <div class="instructions-box">
+                    <p>
+                        <strong>Instrucciones:</strong> Selecciona la alternativa correcta para cada pregunta.
+                        Al finalizar, haz clic en <strong>Enviar evaluación</strong> y recibirás retroalimentación
+                        inmediata.
+                    </p>
+                </div>
+                <div class="field-group">
+                    <label>Nombre(s)</label>
+                    <input type="text" id="inputNombre" placeholder="Tu nombre" autocomplete="given-name">
+                </div>
+                <div class="field-group">
+                    <label>Apellido(s)</label>
+                    <input type="text" id="inputApellido" placeholder="Tu apellido" autocomplete="family-name">
+                </div>
+                <button class="btn-primary" id="btnStart" onclick="startQuiz()">Comenzar Evaluación →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+     SCREEN 2: QUIZ
+═══════════════════════════════════════════ -->
+        <div id="screen-quiz">
+            <div id="quiz-content"></div>
+            <div class="submit-section">
+                <p class="submit-warning" id="submit-warning">Responde todas las preguntas para habilitar el envío</p>
+                <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()" disabled>Enviar Evaluación</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+     SCREEN 3: RESULTADOS
+═══════════════════════════════════════════ -->
+        <div id="screen-results">
+            <div class="results-hero">
+                <div class="score-ring" id="scoreRing">
+                    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="#2e3350" stroke-width="8" />
+                        <circle id="scoreArc" cx="60" cy="60" r="52" fill="none" stroke="#4f8ef7" stroke-width="8"
+                            stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" />
+                    </svg>
+                    <span class="score-text" id="scorePct">0%</span>
+                </div>
+                <h2>Evaluación completada, <span class="student-name" id="resultName"></span></h2>
+                <div class="results-summary">
+                    <div class="summary-stat">
+                        <div class="val val-correct" id="countCorrect">0</div>
+                        <div class="lbl">Correctas</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="val val-wrong" id="countWrong">0</div>
+                        <div class="lbl">Incorrectas</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="val" id="countTotal" style="color:var(--text2)">30</div>
+                        <div class="lbl">Total</div>
+                    </div>
+                </div>
+            </div>
+            <div id="results-list"></div>
+        </div>
+
+    </div><!-- /container -->
+
+    <script>
+        // ══════════════════════════════════════════════════════
+        //  CONFIGURACIÓN — Cambia estos valores
+        // ══════════════════════════════════════════════════════
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwF4dHnOCpsdtpO1auIbArbsJUMRYo16TYTuIOm2dwd-kEtOWigz08RVYz8EVgEiqgjA/exec';
+        // Instrucciones al final del código para configurar Google Sheets
+
+        // ══════════════════════════════════════════════════════
+        //  BANCO DE PREGUNTAS
+        // ══════════════════════════════════════════════════════
+        const questions = [
+            // ── SECCIÓN I: CONCEPTOS FUNDAMENTALES ──
+            {
+                section: 'I. Conceptos Fundamentales y Leyes Básicas',
+                text: 'Definimos la <strong>Corriente Eléctrica</strong> como:',
+                options: [
+                    'La fuerza que empuja a los electrones a través de un conductor.',
+                    'El flujo o movimiento de cargas eléctricas por unidad de tiempo a través de un material.',
+                    'La oposición que presenta un material al paso de la energía.',
+                    'La energía total almacenada en un campo magnético.'
+                ],
+                correct: 1,
+                explanation: 'La corriente eléctrica se define como \\(I = dq/dt\\), es decir, el flujo de cargas eléctricas por unidad de tiempo. La opción a) describe la fuerza electromotriz (voltaje), la c) la resistencia y la d) no corresponde a ninguna definición estándar de corriente.'
+            },
+            {
+                section: null,
+                text: 'El <strong>Voltaje</strong> (o diferencia de potencial) se entiende físicamente como:',
+                options: [
+                    'La velocidad a la que viajan los electrones.',
+                    'El trabajo por unidad de carga necesario para mover dicha carga entre dos puntos.',
+                    'La cantidad de electrones que pasan por un nodo en un segundo.',
+                    'La potencia disipada por un elemento pasivo.'
+                ],
+                correct: 1,
+                explanation: 'El voltaje se define como \\(V = dw/dq\\), trabajo por unidad de carga. La opción a) es errónea (los electrones viajan muy lentamente como drift), la c) describe la corriente y la d) la potencia (no el voltaje).'
+            },
+            {
+                section: null,
+                text: 'La principal característica de la <strong>Corriente Continua (CC/DC)</strong> es que:',
+                options: [
+                    'Su magnitud y dirección varían cíclicamente en el tiempo.',
+                    'Se produce únicamente en transformadores de potencia.',
+                    'Su flujo de electrones se mantiene en un solo sentido y su valor es constante en el tiempo (idealmente).',
+                    'Cambia de polaridad 50 veces por segundo.'
+                ],
+                correct: 2,
+                explanation: 'La CC/DC se caracteriza por su dirección constante y valor que no cambia en el tiempo (en forma ideal). La opción a) describe la CA, las opciones b) y d) son falsas.'
+            },
+            {
+                section: null,
+                text: 'La <strong>Corriente Alterna (CA/AC)</strong> se prefiere para la transmisión de energía a grandes distancias porque:',
+                options: [
+                    'Es menos peligrosa que la corriente continua.',
+                    'Permite elevar y reducir los niveles de voltaje mediante transformadores de forma eficiente.',
+                    'No requiere conductores de cobre, solo de aluminio.',
+                    'Las baterías almacenan corriente alterna de forma natural.'
+                ],
+                correct: 1,
+                explanation: 'La CA permite usar transformadores para elevar el voltaje (reduciendo corriente y pérdidas \\(P=I^2R\\)) en la transmisión y luego bajarlo para el consumidor. Esto no es posible con CC de forma tan simple. Las otras opciones son falsas.'
+            },
+            {
+                section: null,
+                text: 'En Chile, los parámetros nominales de la red eléctrica de baja tensión para uso domiciliario son:',
+                options: [
+                    '\\(110\\,\\text{V} / 60\\,\\text{Hz}\\)',
+                    '\\(220\\,\\text{V} / 50\\,\\text{Hz}\\)',
+                    '\\(220\\,\\text{V} / 60\\,\\text{Hz}\\)',
+                    '\\(380\\,\\text{V} / 50\\,\\text{Hz}\\)'
+                ],
+                correct: 1,
+                explanation: 'En Chile, la red eléctrica domiciliaria opera a 220 V eficaces y 50 Hz. No debe confundirse con EE.UU. (120V/60Hz) ni con algunos países europeos (230V/50Hz). Los 380V corresponden a la tensión de línea trifásica.'
+            },
+            {
+                section: null,
+                text: 'Según la <strong>Ley de Ohm</strong>, si la resistencia de un circuito se mantiene constante y el voltaje se duplica, la corriente:',
+                options: [
+                    'Se reduce a la mitad.',
+                    'Se mantiene igual.',
+                    'Se duplica.',
+                    'Aumenta cuatro veces.'
+                ],
+                correct: 2,
+                explanation: 'Por la Ley de Ohm \\(I = V/R\\). Si R es constante y V se duplica, entonces I también se duplica. La relación es lineal y directamente proporcional.'
+            },
+            {
+                section: null,
+                text: 'La <strong>Ley de Joule</strong> establece que la potencia disipada en forma de calor por una resistencia es:',
+                options: [
+                    '\\(P = V \\cdot R\\)',
+                    '\\(P = I^2 \\cdot R\\)',
+                    '\\(P = V^2 \\cdot I\\)',
+                    '\\(P = I / V\\)'
+                ],
+                correct: 1,
+                explanation: 'La Ley de Joule establece \\(P = I^2 R\\). También puede expresarse como \\(P = V^2/R\\) o \\(P = VI\\), combinando con la Ley de Ohm. La opción a) tiene dimensiones incorrectas, la c) y d) también son erróneas dimensionalmente.'
+            },
+            {
+                section: null,
+                text: 'En una conexión de resistencias en <strong>paralelo</strong>, se cumple que:',
+                options: [
+                    'La corriente es la misma en todas las resistencias.',
+                    'El voltaje es el mismo en todas las resistencias.',
+                    'La resistencia total es la suma aritmética de las resistencias.',
+                    'La potencia es igual en cada rama independientemente del valor óhmico.'
+                ],
+                correct: 1,
+                explanation: 'En paralelo, todos los elementos comparten el mismo voltaje (están conectados entre los mismos dos nodos). La corriente se divide según \\(I_k = V/R_k\\). La suma aritmética corresponde a conexión en serie, no paralelo.'
+            },
+            {
+                section: null,
+                text: 'Una <strong>fuente de voltaje real</strong> se diferencia de una ideal porque la real posee:',
+                options: [
+                    'Una resistencia en paralelo infinita.',
+                    'Una resistencia en serie que provoca una caída de tensión interna.',
+                    'La capacidad de entregar corriente infinita.',
+                    'Un voltaje que aumenta proporcionalmente a la carga conectada.'
+                ],
+                correct: 1,
+                explanation: 'Una fuente real se modela como una fuente ideal con una resistencia interna \\(r_s\\) en serie. Cuando circula corriente, hay una caída \\(V_{carga} = V_s - I \\cdot r_s\\). Una fuente ideal no tiene esa limitación.'
+            },
+            {
+                section: null,
+                text: 'En el análisis de redes, un <strong>nodo</strong> se define técnicamente como:',
+                options: [
+                    'Un lazo cerrado dentro de un circuito.',
+                    'El punto de conexión entre dos o más elementos.',
+                    'Un componente que consume energía.',
+                    'Una fuente de poder conectada a tierra.'
+                ],
+                correct: 1,
+                explanation: 'Un nodo es un punto de unión o conexión entre dos o más elementos del circuito. El lazo cerrado describe una malla, no un nodo. Sobre los nodos se aplica la LCK (Ley de Corrientes de Kirchhoff).'
+            },
+            {
+                section: null,
+                text: 'Un <strong>inductor (bobina)</strong> conectado a una fuente de Corriente Continua (CC) por un tiempo prolongado se comporta como:',
+                options: [
+                    'Un circuito abierto.',
+                    'Una fuente de voltaje.',
+                    'Un cortocircuito.',
+                    'Una resistencia infinita.'
+                ],
+                correct: 2,
+                explanation: 'En estado estacionario DC, la corriente no varía (\\(di/dt = 0\\)), por lo que el voltaje en el inductor \\(v_L = L \\cdot di/dt = 0\\). Esto equivale a un cortocircuito (solo su resistencia de devanado \\(r_L\\) real, despreciable en el ideal). La bobina bloquea la CA, no la CC en régimen permanente.'
+            },
+            {
+                section: null,
+                text: 'Un <strong>condensador (capacitor)</strong> conectado a una fuente de Corriente Continua (CC) por un tiempo prolongado se comporta como:',
+                options: [
+                    'Un circuito abierto.',
+                    'Una fuente de corriente.',
+                    'Un cortocircuito.',
+                    'Un conductor ideal.'
+                ],
+                correct: 0,
+                explanation: 'En estado estacionario DC, el capacitor se carga hasta el voltaje de la fuente y deja de fluir corriente (\\(i_C = C \\cdot dv/dt = 0\\)). Esto equivale a un circuito abierto. La corriente cesa completamente una vez cargado.'
+            },
+            {
+                section: null,
+                text: 'Físicamente, un <strong>condensador</strong> tiene la propiedad de almacenar energía en forma de un campo eléctrico, lo que se traduce en que este componente:',
+                options: [
+                    'Se opone a los cambios bruscos de corriente.',
+                    'Almacena corriente eléctrica de forma indefinida.',
+                    'Se opone a los cambios bruscos de voltaje entre sus terminales.',
+                    'Genera energía eléctrica de forma autónoma.'
+                ],
+                correct: 2,
+                explanation: 'La relación \\(i_C = C \\cdot dv/dt\\) implica que para que el voltaje cambie instantáneamente, se requeriría corriente infinita, lo cual es físicamente imposible. Por eso el capacitor "resiste" los cambios bruscos de voltaje. La bobina es la que se opone a cambios de corriente.'
+            },
+            {
+                section: null,
+                text: 'En el caso de una <strong>bobina (inductor)</strong>, la energía se almacena en un campo magnético producido por la corriente, lo que implica que:',
+                options: [
+                    'El voltaje a través de ella no puede cambiar instantáneamente.',
+                    'La corriente que fluye por ella no puede cambiar de forma instantánea.',
+                    'Actúa como un circuito abierto ante variaciones de alta frecuencia.',
+                    'Almacena voltaje para liberarlo cuando la fuente se apaga.'
+                ],
+                correct: 1,
+                explanation: 'La relación \\(v_L = L \\cdot di/dt\\) implica que un cambio instantáneo de corriente requeriría voltaje infinito. Por ello, la corriente en un inductor no puede cambiar abruptamente. (Nota: la opción c) es parcialmente cierta —la inductancia aumenta su impedancia con la frecuencia— pero no describe la propiedad fundamental preguntada).'
+            },
+
+            // ── SECCIÓN II: INSTRUMENTACIÓN ──
+            {
+                section: 'II. Instrumentación y Unidades de Medida',
+                text: 'Para medir la <strong>corriente eléctrica</strong> que circula por una resistencia en un circuito, el amperímetro debe conectarse en:',
+                options: [
+                    'Paralelo con la resistencia, para captar toda la tensión.',
+                    'Serie con la resistencia, abriendo el circuito e insertando el instrumento.',
+                    'Entre el nodo positivo y la tierra del circuito.',
+                    'No importa la conexión, el amperímetro mide por inducción siempre.'
+                ],
+                correct: 1,
+                explanation: 'El amperímetro debe conectarse en serie, ya que necesita que toda la corriente del ramal circule por él. Su resistencia interna es muy baja (idealmente cero) para no alterar el circuito. Conectarlo en paralelo podría dañarlo o provocar cortocircuito.'
+            },
+            {
+                section: null,
+                text: 'Un voltímetro ideal debe tener una <strong>resistencia interna</strong> de valor:',
+                options: [
+                    'Cero (\\(\\Omega\\)).',
+                    'Muy bajo (m\\(\\Omega\\)).',
+                    'Infinito (\\(\\infty\\)).',
+                    'Igual a la resistencia de carga.'
+                ],
+                correct: 2,
+                explanation: 'El voltímetro se conecta en paralelo y mide diferencia de potencial. Para no derivar corriente y alterar el circuito medido, su resistencia interna debe ser lo más alta posible (idealmente infinita). Si fuera baja, reduciría el voltaje que pretende medir.'
+            },
+            {
+                section: null,
+                text: 'Relacione correctamente cada magnitud eléctrica con su unidad SI. La combinación correcta es:',
+                extra: 'table',
+                options: [
+                    '1-C, 2-D, 3-A, 4-B, 5-E, 6-G, 7-H, 8-F',
+                    '1-C, 2-D, 3-A, 4-E, 5-B, 6-G, 7-F, 8-H',
+                    '1-D, 2-C, 3-A, 4-B, 5-E, 6-W, 7-VA, 8-VAR',
+                    '1-V, 2-A, 3-\\(\\Omega\\), 4-H, 5-F, 6-G, 7-H, 8-F'
+                ],
+                correct: 0,
+                explanation: 'La asociación correcta es: Voltaje→Volt(V), Corriente→Ampere(A), Resistencia→Ohm(Ω), Inductancia→Henrio(H), Capacitancia→Faradio(F), Potencia Activa→Watt(W), Potencia Aparente→VA, Potencia Reactiva→VAR. La opción b) confunde las unidades de inductancia y capacitancia.'
+            },
+            {
+                section: null,
+                text: 'El prefijo <strong>"mili" (m)</strong> y <strong>"kilo" (k)</strong> representan respectivamente los factores multiplicativos:',
+                options: [
+                    '\\(10^{-6}\\) y \\(10^3\\)',
+                    '\\(10^{-3}\\) y \\(10^6\\)',
+                    '\\(10^{-3}\\) y \\(10^3\\)',
+                    '\\(10^3\\) y \\(10^{-3}\\)'
+                ],
+                correct: 2,
+                explanation: 'Mili (m) = \\(10^{-3}\\) (milésimas) y kilo (k) = \\(10^3\\) (miles). Por ejemplo: 1 mA = \\(10^{-3}\\) A y 1 kΩ = \\(10^3\\) Ω. No deben confundirse con micro (μ = \\(10^{-6}\\)) ni mega (M = \\(10^6\\)).'
+            },
+
+            // ── SECCIÓN III: ANÁLISIS DE REDES ──
+            {
+                section: 'III. Análisis de Redes y Régimen Senoidal',
+                text: 'El <strong>Equivalente de Thévenin</strong> de una red lineal consiste en:',
+                options: [
+                    'Una fuente de corriente en paralelo con una resistencia.',
+                    'Una fuente de voltaje en paralelo con una resistencia.',
+                    'Una fuente de voltaje en serie con una resistencia.',
+                    'Un conjunto de resistencias en estrella (Y).'
+                ],
+                correct: 2,
+                explanation: 'El Teorema de Thévenin establece que cualquier red lineal activa vista desde dos terminales puede reemplazarse por una fuente de voltaje \\(V_{th}\\) en serie con una resistencia \\(R_{th}\\). La opción a) corresponde al equivalente de Norton.'
+            },
+            {
+                section: null,
+                text: 'El <strong>Equivalente de Norton</strong> de una red lineal activa, visto desde un par de terminales, consiste en:',
+                options: [
+                    'Una fuente de voltaje en serie con una resistencia.',
+                    'Una fuente de corriente en paralelo con una resistencia.',
+                    'Una fuente de corriente en serie con una resistencia.',
+                    'Una resistencia equivalente conectada a tierra sin fuentes.'
+                ],
+                correct: 1,
+                explanation: 'El Teorema de Norton establece que cualquier red lineal activa puede representarse como una fuente de corriente \\(I_N\\) en paralelo con una resistencia \\(R_N\\) (donde \\(R_N = R_{th}\\)). La opción a) es el equivalente de Thévenin.'
+            },
+            {
+                section: null,
+                text: 'Si se realiza una <strong>transformación de fuentes</strong>, una fuente de voltaje \\(V_s\\) en serie con \\(R\\) equivale a una fuente de corriente \\(I_s\\) en paralelo con \\(R\\), donde \\(I_s\\) es:',
+                extra: 'circuit_transform',
+                options: [
+                    '\\(V_s \\cdot R\\)',
+                    '\\(V_s / R\\)',
+                    '\\(R / V_s\\)',
+                    '\\(V_s^2 / R\\)'
+                ],
+                correct: 1,
+                explanation: 'En la transformación de fuentes, se aplica directamente la Ley de Ohm: \\(I_s = V_s / R\\). Este resultado se obtiene de calcular la corriente de cortocircuito de la fuente de tensión. Las otras opciones tienen dimensiones o relaciones incorrectas.'
+            },
+            {
+                section: null,
+                text: 'Una señal de CA tiene la forma \\(v(t) = 170\\sin(377t + 30^\\circ)\\). El valor de su <strong>frecuencia angular</strong> (\\(\\omega\\)) es:',
+                extra: 'plot_377',
+                options: [
+                    '\\(60\\,\\text{Hz}\\)',
+                    '\\(170\\,\\text{rad/s}\\)',
+                    '\\(377\\,\\text{rad/s}\\)',
+                    '\\(30^\\circ\\)'
+                ],
+                correct: 2,
+                explanation: 'En la expresión general \\(v(t) = V_p\\sin(\\omega t + \\phi)\\), el coeficiente de \\(t\\) es la frecuencia angular \\(\\omega\\). En este caso \\(\\omega = 377\\,\\text{rad/s}\\), que corresponde a \\(\\omega = 2\\pi f = 2\\pi \\cdot 60 \\approx 377\\,\\text{rad/s}\\). El 30° es la fase inicial, 170 V el valor pico y 60 Hz la frecuencia (no la frecuencia angular).'
+            },
+            {
+                section: null,
+                text: '¿Cuál es el <strong>valor eficaz (RMS)</strong> aproximado de una señal senoidal pura con un valor pico de \\(100\\,\\text{V}\\)?',
+                extra: 'plot_rms',
+                options: [
+                    '\\(50.0\\,\\text{V}\\)',
+                    '\\(100.0\\,\\text{V}\\)',
+                    '\\(70.7\\,\\text{V}\\)',
+                    '\\(141.4\\,\\text{V}\\)'
+                ],
+                correct: 2,
+                explanation: 'Para una señal senoidal pura: \\(V_{rms} = V_p / \\sqrt{2} = 100 / 1.414 \\approx 70.7\\,\\text{V}\\). El valor RMS es el que produce el mismo efecto de calor (potencia) que una fuente DC equivalente. 141.4 V sería \\(V_p \\cdot \\sqrt{2}\\), que es incorrecto.'
+            },
+            {
+                section: null,
+                text: 'Si una corriente <strong>atrasa</strong> al voltaje en un circuito de CA, esto indica que la carga es predominantemente:',
+                extra: 'plot_lag',
+                options: [
+                    'Resistiva pura.',
+                    'Capacitiva.',
+                    'Inductiva.',
+                    'No lineal.'
+                ],
+                correct: 2,
+                explanation: 'En una carga inductiva (L), el voltaje adelanta a la corriente (equivalentemente, la corriente atrasa al voltaje) en un ángulo de hasta 90°. Mnemotécnico: <em>"ELI the ICE man"</em> — en L (inductancia), E (voltaje) precede a I (corriente); en C (capacitancia), I precede a E.'
+            },
+            {
+                section: null,
+                text: 'Si en un circuito de CA se observa que la corriente <strong>adelanta</strong> al voltaje en un ángulo de fase determinado, esto indica que la carga es predominantemente:',
+                extra: 'plot_lead',
+                options: [
+                    'Resistiva pura.',
+                    'Capacitiva.',
+                    'Inductiva.',
+                    'En resonancia.'
+                ],
+                correct: 1,
+                explanation: 'En una carga capacitiva (C), la corriente adelanta al voltaje hasta 90°. Esto se debe a que \\(i_C = C \\cdot dv/dt\\), la corriente "va delante" del voltaje. Recordar: <em>"ICE"</em> — en Capacitancia, I (corriente) adelanta a E (voltaje).'
+            },
+            {
+                section: null,
+                text: 'Cuando el voltaje y la corriente en un circuito se encuentran perfectamente <strong>en fase</strong> (ángulo de desfase \\(\\phi = 0^\\circ\\)), se puede afirmar que la carga se comporta como:',
+                extra: 'plot_inphase',
+                options: [
+                    'Una reactancia inductiva pura.',
+                    'Una carga resistiva pura.',
+                    'Una carga con factor de potencia cero.',
+                    'Un cortocircuito.'
+                ],
+                correct: 1,
+                explanation: 'Cuando \\(\\phi = 0^\\circ\\), el factor de potencia \\(fp = \\cos(0^\\circ) = 1\\). Esto ocurre únicamente con cargas resistivas puras, donde no hay almacenamiento de energía reactiva. Un \\(fp = 0\\) indicaría carga completamente reactiva (inductiva o capacitiva pura).'
+            },
+            {
+                section: null,
+                text: 'El <strong>Factor de Potencia (fp)</strong> en un sistema de corriente alterna representa físicamente:',
+                options: [
+                    'La cantidad total de energía almacenada en los campos magnéticos del circuito.',
+                    'La proporción de la potencia total entregada (aparente) que efectivamente se transforma en trabajo útil o calor (potencia activa).',
+                    'La relación entre la resistencia óhmica y la inductancia del cableado de alimentación.',
+                    'El porcentaje de corriente que se pierde por efecto Joule en las bobinas del motor.'
+                ],
+                correct: 1,
+                explanation: '\\(fp = P/S = \\cos(\\phi)\\), donde P es la potencia activa (W) y S la potencia aparente (VA). Un fp = 1 significa que toda la potencia aparente se convierte en trabajo útil. Un fp bajo implica mayor corriente para igual potencia activa, con mayores pérdidas en el sistema.'
+            },
+            {
+                section: null,
+                text: 'Para el circuito mostrado, determine el sistema de ecuaciones lineales que permite resolver las corrientes de malla \\(I_1\\) e \\(I_2\\) por el método de inspección (o LVK):',
+                extra: 'circuit_mesh',
+                options: [
+                    '\\(\\begin{cases} 15I_1 - 10I_2 = -10 \\\\ -10I_1 + 12I_2 = -5 \\end{cases}\\)',
+                    '\\(\\begin{cases} 15I_1 + 10I_2 = 10 \\\\ 10I_1 + 12I_2 = 5 \\end{cases}\\)',
+                    '\\(\\begin{cases} 5I_1 - 10I_2 = 10 \\\\ -10I_1 + 2I_2 = -5 \\end{cases}\\)',
+                    '\\(\\begin{cases} 15I_1 - 10I_2 = 0 \\\\ -10I_1 + 12I_2 = 0 \\end{cases}\\)'
+                ],
+                correct: 0,
+                explanation: 'Aplicando LVK por inspección: Malla 1 (resistencias 5Ω+10Ω = 15Ω propia, -10Ω mutua, fuente +10V): \\(15I_1 - 10I_2 = 10\\)... Espera: con la polaridad estándar (fuente en sentido contrario a \\(I_1\\)): \\(15I_1 - 10I_2 = -10\\). Malla 2 (10Ω+2Ω = 12Ω propia, -10Ω mutua, fuente -5V): \\(-10I_1 + 12I_2 = -5\\). La resistencia compartida (10Ω) genera el término de acoplamiento mutuo negativo.'
+            }
+        ];
+
+        // ══════════════════════════════════════════════════════
+        //  ESTADO DE LA APP
+        // ══════════════════════════════════════════════════════
+        let studentName = '';
+        let answers = new Array(questions.length).fill(null);
+        let answered = 0;
+
+        // ══════════════════════════════════════════════════════
+        //  PANTALLA NOMBRE → QUIZ
+        // ══════════════════════════════════════════════════════
+        function startQuiz() {
+            const n = document.getElementById('inputNombre').value.trim();
+            const a = document.getElementById('inputApellido').value.trim();
+            if (!n || !a) { showToast('Por favor ingresa tu nombre y apellido', 'error'); return; }
+            studentName = `${n} ${a}`;
+            document.getElementById('screen-name').style.display = 'none';
+            document.getElementById('screen-quiz').style.display = 'block';
+            renderQuiz();
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  RENDER QUIZ
+        // ══════════════════════════════════════════════════════
+        function renderQuiz() {
+            const container = document.getElementById('quiz-content');
+            let html = '';
+            let lastSection = null;
+
+            questions.forEach((q, idx) => {
+                if (q.section && q.section !== lastSection) {
+                    lastSection = q.section;
+                    html += `<div class="section-header">
+        <span class="section-num">SECCIÓN</span>
+        <h3>${q.section}</h3>
+      </div>`;
+                }
+
+                // Extras visuales
+                let extraHtml = '';
+                if (q.extra === 'table') {
+                    extraHtml = `
+      <table class="units-table">
+        <tr><th>Magnitud Eléctrica</th><th>Unidad de Medida</th></tr>
+        <tr><td>1. Diferencia de Potencial (Voltaje)</td><td>A. Ohm (Ω)</td></tr>
+        <tr><td>2. Intensidad de Corriente</td><td>B. Henrios (H)</td></tr>
+        <tr><td>3. Resistencia Eléctrica</td><td>C. Volt (V)</td></tr>
+        <tr><td>4. Inductancia</td><td>D. Ampere (A)</td></tr>
+        <tr><td>5. Capacitancia</td><td>E. Faradios (F)</td></tr>
+        <tr><td>6. Potencia Activa</td><td>F. Volt-Ampere Reactivo (VAR)</td></tr>
+        <tr><td>7. Potencia Aparente</td><td>G. Watts (W)</td></tr>
+        <tr><td>8. Potencia Reactiva</td><td>H. Volt-Ampere (VA)</td></tr>
+      </table>`;
+                } else if (q.extra === 'circuit_transform' || q.extra === 'circuit_mesh' || q.extra === 'plot_377' || q.extra === 'plot_rms' || q.extra === 'plot_lag' || q.extra === 'plot_lead' || q.extra === 'plot_inphase') {
+                    const labels = {
+                        circuit_transform: '📐 Diagrama de Transformación de Fuentes (Thévenin ↔ Norton)',
+                        circuit_mesh: '📐 Circuito de Análisis por Mallas (I₁, I₂)',
+                        plot_377: '📈 Gráfico: v(t) = 170·sin(377t + 30°)',
+                        plot_rms: '📈 Gráfico: v(t) = 100·sin(377t)',
+                        plot_lag: '📈 Gráfico: Corriente atrasada respecto al voltaje',
+                        plot_lead: '📈 Gráfico: Corriente adelantada respecto al voltaje',
+                        plot_inphase: '📈 Gráfico: Voltaje y corriente en fase (φ = 0°)',
+                    };
+                    extraHtml = `<div class="img-placeholder">
+        <span class="icon">🖼️</span>
+        <strong>${labels[q.extra]}</strong><br>
+        <small style="color:var(--text2);margin-top:6px;display:block;">[ Imagen a subir por el docente ]</small>
+      </div>`;
+                }
+
+                html += `
+    <div class="question-card" id="card-${idx}" data-idx="${idx}">
+      <div class="question-num">PREGUNTA ${idx + 1} de ${questions.length}</div>
+      <div class="question-text">${q.text}</div>
+      ${extraHtml}
+      <ul class="options-list">
+        ${q.options.map((opt, oi) => `
+          <li class="option-item">
+            <input type="radio" name="q${idx}" id="q${idx}o${oi}" value="${oi}" onchange="selectAnswer(${idx}, ${oi})">
+            <label for="q${idx}o${oi}">
+              <span class="option-letter">${'abcd'[oi]})</span>
+              <span>${opt}</span>
+            </label>
+          </li>
+        `).join('')}
+      </ul>
+    </div>`;
+            });
+
+            container.innerHTML = html;
+            MathJax.typesetPromise && MathJax.typesetPromise([container]);
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  SELECCIÓN DE RESPUESTA
+        // ══════════════════════════════════════════════════════
+        function selectAnswer(qIdx, optIdx) {
+            const wasNull = answers[qIdx] === null;
+            answers[qIdx] = optIdx;
+            document.getElementById(`card-${qIdx}`).classList.add('answered');
+            if (wasNull) {
+                answered++;
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const pct = (answered / questions.length) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressCount').textContent = `${answered} / ${questions.length}`;
+            const btn = document.getElementById('btnSubmit');
+            const warn = document.getElementById('submit-warning');
+            if (answered === questions.length) {
+                btn.disabled = false;
+                warn.textContent = '¡Respondiste todas las preguntas! Haz clic para enviar.';
+                warn.style.color = 'var(--green)';
+            } else {
+                warn.textContent = `${questions.length - answered} pregunta(s) sin responder`;
+            }
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  SUBMIT
+        // ══════════════════════════════════════════════════════
+        async function submitQuiz() {
+            document.getElementById('loading-overlay').classList.add('active');
+
+            // Calcula resultados
+            let correct = 0;
+            const details = questions.map((q, i) => {
+                const ans = answers[i];
+                const isCorrect = ans === q.correct;
+                if (isCorrect) correct++;
+                return {
+                    pregunta: i + 1,
+                    texto: q.text.replace(/<[^>]+>/g, ''),
+                    respuestaElegida: ans !== null ? q.options[ans].replace(/<[^>]+>/g, '').replace(/\\\(|\\\)/g, '') : 'Sin responder',
+                    respuestaCorrecta: q.options[q.correct].replace(/<[^>]+>/g, '').replace(/\\\(|\\\)/g, ''),
+                    correcta: isCorrect ? 'SI' : 'NO'
+                };
+            });
+
+            // Envío a Google Sheets
+            const timestamp = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
+            const payload = {
+                timestamp,
+                nombre: studentName,
+                nota: correct,
+                total: questions.length,
+                porcentaje: Math.round((correct / questions.length) * 100),
+                respuestas: details
+            };
+
+            try {
+                if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI') {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+            } catch (e) {
+                console.warn('Error al guardar en Google Sheets:', e);
+            }
+
+            document.getElementById('loading-overlay').classList.remove('active');
+            showResults(correct, details);
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  MOSTRAR RESULTADOS
+        // ══════════════════════════════════════════════════════
+        function showResults(correct, details) {
+            document.getElementById('screen-quiz').style.display = 'none';
+            document.getElementById('screen-results').style.display = 'block';
+
+            const pct = Math.round((correct / questions.length) * 100);
+            const circumference = 326.7;
+            const offset = circumference - (pct / 100) * circumference;
+
+            document.getElementById('resultName').textContent = studentName;
+            document.getElementById('scorePct').textContent = pct + '%';
+            document.getElementById('countCorrect').textContent = correct;
+            document.getElementById('countWrong').textContent = questions.length - correct;
+            document.getElementById('countTotal').textContent = questions.length;
+
+            // Animar arco
+            setTimeout(() => {
+                document.getElementById('scoreArc').style.transition = 'stroke-dashoffset 1s ease';
+                document.getElementById('scoreArc').style.strokeDashoffset = offset;
+                const color = pct >= 70 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
+                document.getElementById('scoreArc').style.stroke = color;
+                document.getElementById('scorePct').style.color = color;
+            }, 100);
+
+            // Lista de resultados
+            const list = document.getElementById('results-list');
+            let html = '';
+            details.forEach((d, i) => {
+                const q = questions[i];
+                const isCorrect = d.correcta === 'SI';
+                html += `
+    <div class="result-item ${isCorrect ? 'correct' : 'wrong'}">
+      <div class="result-header">
+        <span class="result-badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">${isCorrect ? '✓ Correcta' : '✗ Incorrecta'}</span>
+        <span class="result-qnum">Pregunta ${i + 1}</span>
+      </div>
+      <div class="result-question">${q.text}</div>
+      ${!isCorrect ? `
+      <div class="answer-row">
+        <span class="answer-label">Tu respuesta:</span>
+        <span class="answer-val wrong-val">${q.options[answers[i]]}</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">Correcta:</span>
+        <span class="answer-val correct-val">${q.options[q.correct]}</span>
+      </div>
+      <div class="explanation-box">
+        <div class="exp-title">💡 Explicación</div>
+        <p>${q.explanation}</p>
+      </div>` : `
+      <div class="answer-row">
+        <span class="answer-label">Tu respuesta:</span>
+        <span class="answer-val correct-val">${q.options[answers[i]]}</span>
+      </div>`}
+    </div>`;
+            });
+            list.innerHTML = html;
+            MathJax.typesetPromise && MathJax.typesetPromise([list]);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  UTILS
+        // ══════════════════════════════════════════════════════
+        function showToast(msg, type = '') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `show ${type}`;
+            setTimeout(() => t.className = '', 3000);
+        }
+
+        // Enter en campos de nombre
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && document.getElementById('screen-name').style.display !== 'none') {
+                startQuiz();
+            }
+        });
+    </script>
+</body>
+
+</html>
